@@ -1,9 +1,16 @@
-# Physics-Informed Neural Networks for Burgers' Equation
+# Physics-Informed Neural Networks for Burgers' Equation (PyTorch)
+
+[![Author](https://img.shields.io/badge/Author-harshu0117-blue)](https://github.com/harshu0117)
+[![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?logo=pytorch&logoColor=white&style=flat)](https://pytorch.org/)
+
+
+This repository provides a modern **PyTorch** implementation of Physics-Informed Neural Networks (PINNs) to solve both forward and inverse problems for the 1D Burgers' equation. It serves as a practical, hands-on guide to understanding and applying PINNs, demonstrating their power in modeling physical systems and discovering underlying parameters from data.
+
+The primary goal of this project is to replicate the results of the original paper by Raissi et al. while translating the codebase from its original **TensorFlow 1.x** to the more modern and widely-used **PyTorch** framework. This provides an updated and more accessible version for researchers and practitioners familiar with the PyTorch ecosystem.
 
 This repository contains the code and experiments for solving both the **forward and inverse problems** of the 1D Burgers' equation using Physics-Informed Neural Networks (PINNs). The implementation is based on the original paper by Raissi, Perdikaris, and Karniadakis, "[Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations](https://arxiv.org/abs/1711.10561)".
 
 The notebooks demonstrate how a neural network can be trained to respect the laws of physics defined by a partial differential equation (PDE), enabling it to solve for the system's state or even discover the PDE's underlying parameters from data.
-
 ---
 
 ## 🎯 Project Structure
@@ -12,6 +19,7 @@ The notebooks demonstrate how a neural network can be trained to respect the law
 * **`inverse_continuous.ipynb`**: A Jupyter notebook that solves the **inverse problem**. Given a sparse and noisy set of measurement data for `u(x, t)`, it discovers the unknown parameters of the Burgers' equation.
 * **`src/`**: A directory containing the core Python modules for the PINN model (`PhysicsInformedNN.py`), the training logic (`trainer.py`), data handling (`utilities.py`), and plotting functions (`visualisation.py`).
 * **`data/`**: Contains the reference solution data (`burgers_shock.mat`).
+* **`equations/1D_Burgers/`**: Contains the notebooks and the generated result images.
 
 ---
 
@@ -53,37 +61,38 @@ The notebooks demonstrate how a neural network can be trained to respect the law
 
 **Goal:** To predict the solution `u(x, t)` of the Burgers' equation given known initial and boundary conditions.
 
-**Methodology:** We compared two optimization methods: a direct L-BFGS approach and a hybrid method that starts with the Adam optimizer before fine-tuning with L-BFGS.
-
 **Key Findings:**
-The L-BFGS-only method achieved a final relative L2 error of **`6.13e-3`**. The hybrid Adam + L-BFGS method, while powerful in theory, showed some training instability in our run, resulting in a slightly higher error of **`9.01e-3`**. This highlights the sensitivity of the training process to the optimization strategy.
+The L-BFGS-only method achieved a final relative L2 error of **`6.13e-3`**. The hybrid Adam + L-BFGS method showed some training instability, resulting in a slightly higher error of **`9.01e-3`**. This highlights the sensitivity of the training process to the optimization strategy.
 
 #### **Visual Results (Forward Problem)**
 
-**Solution Comparison (L-BFGS Method)**
-*(Here, you should insert the three-panel image showing the Predicted Solution, the Exact Solution, and the Absolute Error heatmaps from `forward_continuous.ipynb`)*
+<table>
+  <tr>
+    <td align="center"><strong>Ground Truth</strong></td>
+    <td align="center"><strong>Prediction (L-BFGS)</strong></td>
+    <td align="center"><strong>Prediction (Hybrid)</strong></td>
+  </tr>
+  <tr>
+    <td><img src="equations/1D_Burgers/ground_truth.png" width="300"/></td>
+    <td><img src="equations/1D_Burgers/pred_sol_lbfgs.png" width="300"/></td>
+    <td><img src="equations/1D_Burgers/pred_sol_hybrid.png" width="300"/></td>
+  </tr>
+</table>
 
-*Caption: Comparison of the PINN's predicted solution against the exact solution for the forward problem.*
+**Predicted Solution (Forward Problem)**
+<p align="center">
+  <img src="equations/1D_Burgers/pred_sol.png" width="800"/>
+</p>
 
-**Training Instability in Hybrid Method**
-*(Here, you should insert the loss history plot from the hybrid training run that shows the spikes during the L-BFGS phase.)*
-
-*Caption: The training loss history for the hybrid Adam + L-BFGS method. The spikes during the L-BFGS phase (after 10,000 epochs) indicate optimization instability.*
-
----
 
 ### 2. The Inverse Problem
 
 **Goal:** To discover the unknown parameters ($\lambda_1, \lambda_2$) of the Burgers' equation using only a sparse set of 2,000 noisy data points.
 
-**Methodology:** The PINN was trained to minimize a composite loss function that penalizes both the mismatch with the measurement data and the residual of the PDE. The parameters $\lambda_1$ and $\lambda_2$ were treated as learnable variables optimized alongside the network's weights.
-
 **Key Findings:**
 The model successfully identified the hidden parameters with remarkable accuracy, demonstrating its robustness to noise. The final learned PDE is very close to the true physical law.
 
 #### **Parameter Identification Results (Inverse Problem)**
-
-*(Here, you should insert a clean, formatted table summarizing the parameter discovery results from `inverse_continuous.ipynb`)*
 
 | Parameter | True Value | Predicted Value | Error |
 | :--- | :--- | :--- | :--- |
@@ -94,7 +103,10 @@ The overall solution accuracy was also high, with a final **relative L2 error of
 
 #### **Visual Results (Inverse Problem)**
 
-*(Here, you should insert the three-panel image showing the Predicted Solution, the Exact Solution, and the Absolute Error heatmaps from `inverse_continuous.ipynb`)*
+**Predicted Solution (Inverse Problem)**
+<p align="center">
+  <img src="equations/1D_Burgers/pred_sol_inverse.png" width="800"/>
+</p>
 
 *Caption: Despite training on noisy, sparse data, the PINN reconstructed the full solution field with high fidelity.*
 
